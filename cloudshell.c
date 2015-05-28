@@ -13,7 +13,6 @@ void write_user(user* usr){
 
     if (get_user(usr -> username) != NULL){
         //user already exists 
-        return;
     }
 
     f = fopen(path, "w");
@@ -73,19 +72,19 @@ void register_new_user(char* username, char* password){
     write_user(usr);
 }
 
-void deposit(char* username, double value){
+void deposit(char* username, double balance){
 
     user* usr = get_user(username);
     if (usr == NULL){
         return ; //Username does not exist
     }
-
-
-
-
+    usr -> balance += balance;
+    write_user(usr);
 }
 
 int main(void){
+
+    deposit("12", -5);
 
     
 }

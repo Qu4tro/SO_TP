@@ -27,9 +27,7 @@ void register_new_user(char* username, char* password);
 
 /* void run_command(char* username, char* command); */
 
-/* void deposit(char* username, double value); */
-
-/* void withdraw(char* username, double value); */
+void deposit(char* username, double value);
 
 /* void server(); */
 
