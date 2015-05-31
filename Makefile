@@ -10,6 +10,6 @@ cloudshell: cloudshell.c parse_pidstat.c utils.c
 	$(CC) cloudshell.c parse_pidstat.c utils.c -o cloudshell
 
 clean:
-	rm client
-	rm cloudshell
+	-rm client
+	-rm cloudshell
 
