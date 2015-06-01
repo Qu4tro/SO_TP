@@ -1,5 +1,40 @@
 #include "cloudshell.h"
 
+float parse_pidstat(int pid){
+
+    char command[1024];
+    FILE* pidstat_out; 
+    char buffer[1024];
+
+    /* sprintf(command, "pidstat -u -h -p %d 2 1", pid); */
+    pidstat_out = popen(command, "r");
+
+    int i = 0;
+    while (fgets(buffer, sizeof(buffer), pidstat_out)){
+        if (i < 3){
+            printf("line %d: %s", i, buffer);
+            i++;
+            continue;
+        }
+
+        pclose(pidstat_out);
+        char* field = strtok(buffer, " ");
+        i = 0;
+        while (field != NULL)  {    
+            /* printf("field %d: %s\n", i, field); */
+            if (i == 6){
+                return atof(field) ;
+            }
+            field = strtok(NULL, " ");
+            i++;
+        }
+        break;
+    }
+
+    return -1;
+
+}
+
 void init_db(){
     int ret = mkdir(db, 0744);
     if (!(ret == 0 || errno == EEXIST)) print_error_and_exit();
@@ -24,7 +59,7 @@ void write_to_client(char* message){
 
 pid_t popen_to_pipe(char* command){
 
-    int in_pp;
+    /* int in_pp; */
     int out_pp;
     char* cmd[4] = { "/bin/sh", "-c", command, 0};
     pid_t pid = fork();
@@ -34,24 +69,24 @@ pid_t popen_to_pipe(char* command){
     } else if (pid == 0){
 
         out_pp = open(pp_sc, O_WRONLY);
-        in_pp = open(pp_cs, O_RDONLY);
+        /* in_pp = open(pp_cs, O_RDONLY); */
 
         if (out_pp <= 0){
             printf("Couldn't open server-to-client pipe!\n");
         }
-        if (in_pp  <= 0){
-            printf("Couldn't open client-to-server pipe!\n");
-        }
+        /* if (in_pp  <= 0){ */
+        /*     printf("Couldn't open client-to-server pipe!\n"); */
+        /* } */
 
         dup2(out_pp, 1);
-        dup2(in_pp, 0);
+        /* dup2(in_pp, 0); */
         close(out_pp);
-        close(in_pp);
+        /* close(in_pp); */
         execv(cmd[0], cmd);
 
         write_to_client("Error running command!");
         printf("execv failed!");
-          
+
     } else {
         //parent
     }
@@ -90,6 +125,34 @@ int write_user(user* usr, int action){
     free(usr);
 
     return 1;
+}
+
+char** get_users(){
+
+    int n_users = 1024;
+    char** users = malloc(sizeof(char*) * 1024);
+    users = malloc(n_users * sizeof(char*));
+    for (int i = 0; i < n_users; i++)    
+        users[i] = malloc((100 * sizeof(char)));
+
+
+    DIR           *d;
+    struct dirent *dir;
+    int i = 0;
+
+    d = opendir(".");
+    if (d){
+        while ((dir = readdir(d)) != NULL){
+            /* printf("%s\n", dir->d_name); */
+            strcpy(users[i], dir -> d_name);
+            i++;
+        }
+        closedir(d);
+    }
+
+    strcpy(users[i], "null");
+
+    return users;
 }
 
 user* get_user(char* username){
@@ -312,6 +375,19 @@ void monitor_pipe(){
     }
 }
 
+void monitor_processes(){
+
+    char** users = get_users();
+
+            
+            
+            
+
+
+
+
+
+}
 
 int main(void){
 

@@ -54,7 +54,6 @@ void print_help(){
     exit(EXIT_FAILURE);
 }
 
-
 void registration(char* args[]){
 
     char message[MAX_SIZE];
